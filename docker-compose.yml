@@ -1,0 +1,70 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: oc_nginx
+    ports:
+      - "${APP_PORT:-8090}:80"
+    volumes:
+      - ./backend:/var/www/html
+      - app_storage:/var/www/app_storage
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      php:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/up || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - oc_network
+
+  php:
+    build:
+      context: .
+      dockerfile: infra/php/Dockerfile
+    container_name: oc_php
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -v > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - oc_network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: oc_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ordenes}
+      POSTGRES_USER: ${POSTGRES_USER:-ordenes}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ordenes123}
+    ports:
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ordenes} -d ${POSTGRES_DB:-ordenes}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - oc_network
+
+networks:
+  oc_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  app_storage:

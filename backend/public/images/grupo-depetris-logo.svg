@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="72" viewBox="0 0 240 72" role="img" aria-label="GRUPO DEPETRIS">
+  <rect x="1" y="1" width="70" height="70" rx="10" fill="#111827"/>
+  <text x="36" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">GD</text>
+  <text x="84" y="33" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#111827">GRUPO</text>
+  <text x="84" y="56" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#111827">DEPETRIS</text>
+</svg>
