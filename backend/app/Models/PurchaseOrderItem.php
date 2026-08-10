@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PurchaseOrderUnit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,6 +12,7 @@ class PurchaseOrderItem extends Model
         'purchase_order_id',
         'description',
         'qty',
+        'unit',
         'unit_price',
         'tax_rate',
         'line_total',
@@ -20,6 +22,7 @@ class PurchaseOrderItem extends Model
     {
         return [
             'qty' => 'decimal:2',
+            'unit' => PurchaseOrderUnit::class,
             'unit_price' => 'decimal:2',
             'tax_rate' => 'decimal:2',
             'line_total' => 'decimal:2',

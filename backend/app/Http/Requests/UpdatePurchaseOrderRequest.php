@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PurchaseOrderUnit;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,6 +25,7 @@ class UpdatePurchaseOrderRequest extends FormRequest
             'items' => ['required', 'array', 'min:1'],
             'items.*.description' => ['required', 'string', 'max:255'],
             'items.*.qty' => ['required', 'numeric', 'gt:0'],
+            'items.*.unit' => ['required', Rule::enum(PurchaseOrderUnit::class)],
             'items.*.unit_price' => ['required', 'numeric', 'gte:0'],
             'items.*.tax_rate' => ['nullable', 'numeric', 'gte:0', 'lte:100'],
         ];

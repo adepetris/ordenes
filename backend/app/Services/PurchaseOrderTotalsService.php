@@ -25,6 +25,7 @@ class PurchaseOrderTotalsService
             $normalizedItems[] = [
                 'description' => $item['description'],
                 'qty' => $qty,
+                'unit' => $item['unit'],
                 'unit_price' => $unitPrice,
                 'tax_rate' => $taxRate,
                 'line_total' => $lineTotal,

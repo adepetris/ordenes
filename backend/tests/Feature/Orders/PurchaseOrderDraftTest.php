@@ -33,12 +33,14 @@ class PurchaseOrderDraftTest extends TestCase
                 [
                     'description' => 'Item A',
                     'qty' => 2,
+                    'unit' => 'Kg',
                     'unit_price' => 100,
                     'tax_rate' => 10,
                 ],
                 [
                     'description' => 'Item B',
                     'qty' => 1,
+                    'unit' => 'Un',
                     'unit_price' => 50,
                     'tax_rate' => 0,
                 ],
@@ -63,6 +65,11 @@ class PurchaseOrderDraftTest extends TestCase
         ]);
         $this->assertMatchesRegularExpression('/^OC-\d{4}-\d{6}$/', (string) $order->order_number);
         $this->assertDatabaseCount('purchase_order_items', 2);
+        $this->assertDatabaseHas('purchase_order_items', [
+            'purchase_order_id' => $order->id,
+            'description' => 'Item A',
+            'unit' => 'Kg',
+        ]);
     }
 
     public function test_order_number_increments_sequentially_in_same_year(): void
@@ -83,6 +90,7 @@ class PurchaseOrderDraftTest extends TestCase
             'items' => [[
                 'description' => 'Item',
                 'qty' => 1,
+                'unit' => 'Un',
                 'unit_price' => 10,
                 'tax_rate' => 0,
             ]],
@@ -120,6 +128,7 @@ class PurchaseOrderDraftTest extends TestCase
                 [
                     'description' => 'Item C',
                     'qty' => 1,
+                    'unit' => 'Un',
                     'unit_price' => 10,
                     'tax_rate' => 0,
                 ],
@@ -158,6 +167,7 @@ class PurchaseOrderDraftTest extends TestCase
                 [
                     'description' => 'Item Z',
                     'qty' => 1,
+                    'unit' => 'Un',
                     'unit_price' => 30,
                     'tax_rate' => 0,
                 ],

@@ -54,6 +54,14 @@
                 <label>Cantidad</label>
                 <input type="number" data-field="qty" step="0.01" min="0.01" required>
             </div>
+            <div>
+                <label>Unidad</label>
+                <select data-field="unit" required>
+                    @foreach(\App\Enums\PurchaseOrderUnit::cases() as $unit)
+                        <option value="{{ $unit->value }}">{{ $unit->value }} - {{ $unit->label() }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
         <input type="hidden" data-field="unit_price" value="0">
         <input type="hidden" data-field="tax_rate" value="0">
@@ -73,6 +81,7 @@
         $initialItems = isset($order) ? $order->items->map(fn ($item) => [
             'description' => $item->description,
             'qty' => $item->qty,
+            'unit' => $item->unit->value,
             'unit_price' => $item->unit_price,
             'tax_rate' => $item->tax_rate,
         ])->toArray() : [];
@@ -82,6 +91,7 @@
         $initialItems = [[
             'description' => '',
             'qty' => 1,
+            'unit' => \App\Enums\PurchaseOrderUnit::Unit->value,
             'unit_price' => 0,
             'tax_rate' => 0,
         ]];
@@ -105,11 +115,12 @@
             });
         }
 
-        function addRow(item = { description: '', qty: 1, unit_price: 0, tax_rate: 0 }) {
+        function addRow(item = { description: '', qty: 1, unit: 'Un', unit_price: 0, tax_rate: 0 }) {
             const row = template.content.firstElementChild.cloneNode(true);
 
             row.querySelector('[data-field="description"]').value = item.description ?? '';
             row.querySelector('[data-field="qty"]').value = item.qty ?? 1;
+            row.querySelector('[data-field="unit"]').value = item.unit ?? 'Un';
             row.querySelector('[data-field="unit_price"]').value = 0;
             row.querySelector('[data-field="tax_rate"]').value = 0;
 

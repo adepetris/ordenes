@@ -123,6 +123,7 @@
                 <tr>
                     <th>Descripcion</th>
                     <th>Cantidad</th>
+                    <th>Unidad</th>
                 </tr>
             </thead>
             <tbody>
@@ -130,6 +131,7 @@
                     <tr>
                         <td>{{ $item->description }}</td>
                         <td>{{ number_format((float) $item->qty, 2) }}</td>
+                        <td>{{ $item->unit->value }} - {{ $item->unit->label() }}</td>
                     </tr>
                 @endforeach
             </tbody>
