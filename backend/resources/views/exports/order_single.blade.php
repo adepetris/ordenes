@@ -19,6 +19,7 @@
         th, td { border: 1px solid #d1d5db; padding: 6px; vertical-align: top; }
         th { background: #f3f4f6; text-align: left; }
         .section-title { margin-top: 14px; margin-bottom: 6px; font-weight: 700; }
+        .notes-content { margin: 0; overflow-wrap: break-word; }
     </style>
 </head>
 <body>
@@ -67,5 +68,10 @@
             @endforelse
         </tbody>
     </table>
+
+    @if(filled(trim((string) $order->notes)))
+        <p class="section-title">Notas</p>
+        <p class="notes-content">{!! nl2br(e($order->notes)) !!}</p>
+    @endif
 </body>
 </html>
