@@ -11,7 +11,7 @@ class UiLabels
             'pending_approval' => 'Pendiente de aprobacion',
             'approved' => 'Aprobada',
             'rejected' => 'Rechazada',
-            'cancelled' => 'Cancelada',
+            'cancelled' => 'Anulada',
             default => $status,
         };
     }
@@ -25,6 +25,7 @@ class UiLabels
             'order_auto_approved' => 'Orden autoaprobada',
             'order_approved' => 'Orden aprobada',
             'order_rejected' => 'Orden rechazada',
+            'order_cancelled' => 'Orden anulada',
             'attachment_uploaded' => 'Adjunto cargado',
             'supplier_created' => 'Proveedor creado',
             'supplier_updated' => 'Proveedor actualizado',

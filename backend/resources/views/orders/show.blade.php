@@ -6,7 +6,7 @@
     <div class="page-header page-header-inline">
         <div>
             <h1>Orden {{ $order->order_number ?: ('#'.$order->id) }}</h1>
-            <p class="muted">Estado: {{ \App\Support\UiLabels::orderStatus($order->status) }}</p>
+            <p class="muted">Estado: <span @class(['status-cancelled' => $order->status === 'cancelled'])>{{ \App\Support\UiLabels::orderStatus($order->status) }}</span></p>
         </div>
 
         <div class="actions-row compact-actions">
@@ -33,6 +33,13 @@
 
             @if($order->status === 'approved')
                 <a href="{{ route('orders.export.single', $order) }}" class="btn btn-outline" target="_blank" rel="noopener">Exportar PDF</a>
+            @endif
+
+            @if($order->status !== 'cancelled' && auth()->user()->hasRole('administrador'))
+                <form action="{{ route('orders.cancel', $order) }}" method="POST" onsubmit="return confirm('¿Confirma que desea anular esta orden?');">
+                    @csrf
+                    <button type="submit" class="btn btn-outline">Anular orden</button>
+                </form>
             @endif
         </div>
     </div>

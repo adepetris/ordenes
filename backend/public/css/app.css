@@ -434,6 +434,16 @@ th {
     color: #a72828;
 }
 
+.badge-cancelled {
+    background: #fff0f0;
+    color: #c62828;
+}
+
+.status-cancelled {
+    color: #c62828;
+    font-weight: 700;
+}
+
 .table-link {
     color: var(--primary);
     text-decoration: none;

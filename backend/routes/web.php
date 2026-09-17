@@ -83,6 +83,9 @@ Route::middleware(['auth', 'force.password.change'])->group(function (): void {
     });
 
     Route::middleware('role:administrador')->group(function (): void {
+        Route::post('/orders/{order}/cancel', [PurchaseOrderController::class, 'cancel'])
+            ->whereNumber('order')
+            ->name('orders.cancel');
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');

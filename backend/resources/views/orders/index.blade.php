@@ -24,7 +24,7 @@
         <form method="GET" action="{{ route('orders.index') }}" class="search-form">
             <select name="status">
                 <option value="">Todos los estados</option>
-                @foreach(['draft' => 'Borrador', 'rejected' => 'Rechazada', 'pending_approval' => 'Pendiente', 'approved' => 'Aprobada', 'cancelled' => 'Cancelada'] as $value => $label)
+                @foreach(['draft' => 'Borrador', 'rejected' => 'Rechazada', 'pending_approval' => 'Pendiente', 'approved' => 'Aprobada', 'cancelled' => 'Anulada'] as $value => $label)
                     <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
                 @endforeach
             </select>
@@ -53,7 +53,7 @@
                         <td>{{ $order->order_number ?: ('#'.$order->id) }}</td>
                         <td>{{ $order->supplier->name }}</td>
                         <td>{{ $order->requester->name }}</td>
-                        <td><span class="badge {{ in_array($order->status, ['draft', 'approved'], true) ? 'badge-ok' : 'badge-off' }}">{{ \App\Support\UiLabels::orderStatus($order->status) }}</span></td>
+                        <td><span class="badge {{ $order->status === 'cancelled' ? 'badge-cancelled' : (in_array($order->status, ['draft', 'approved'], true) ? 'badge-ok' : 'badge-off') }}">{{ \App\Support\UiLabels::orderStatus($order->status) }}</span></td>
                         <td>{{ $order->created_at->format('Y-m-d') }}</td>
                         <td>
                             <a href="{{ route('orders.show', $order) }}" class="table-link">Ver</a>

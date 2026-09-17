@@ -408,6 +408,36 @@ class PurchaseOrderController extends Controller
             ->with('status', 'Orden rechazada.');
     }
 
+    public function cancel(PurchaseOrder $order): RedirectResponse
+    {
+        if ($order->status === 'cancelled') {
+            abort(422, 'La orden ya esta anulada.');
+        }
+
+        $previousStatus = $order->status;
+
+        DB::transaction(function () use ($order, $previousStatus): void {
+            $order->update([
+                'status' => 'cancelled',
+            ]);
+
+            $this->auditLogService->log(
+                userId: auth()->id(),
+                entity: 'purchase_order',
+                entityId: $order->id,
+                action: 'order_cancelled',
+                diff: [
+                    'previous_status' => $previousStatus,
+                    'status' => $order->status,
+                ],
+            );
+        });
+
+        return redirect()
+            ->route('orders.show', $order)
+            ->with('status', 'Orden anulada correctamente.');
+    }
+
     public function uploadAttachment(Request $request, PurchaseOrder $order): RedirectResponse
     {
         $validated = $request->validate([
