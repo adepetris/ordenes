@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\AuditLog;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuditLogController extends Controller
 {
@@ -37,7 +38,8 @@ class AuditLogController extends Controller
     public function export(Request $request): Response
     {
         $filters = $this->resolveFilters($request);
-        $fileName = 'audit_logs_'.now()->format('Ymd_His').'.pdf';
+        $generatedAt = now()->setTimezone(config('app.audit_timezone'));
+        $fileName = 'audit_logs_'.$generatedAt->format('Ymd_His').'.pdf';
 
         $logs = $this->applyFilters(AuditLog::query()->with('user'), $filters)
             ->orderByDesc('id')
@@ -46,7 +48,7 @@ class AuditLogController extends Controller
         $pdf = Pdf::loadView('exports.audit_logs', [
             'logs' => $logs,
             'filters' => $filters,
-            'generatedAt' => now(),
+            'generatedAt' => $generatedAt,
         ])->setPaper('a4', 'landscape');
 
         return response($pdf->output(), 200, [
@@ -69,11 +71,19 @@ class AuditLogController extends Controller
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
+        $timezone = config('app.audit_timezone');
+        $dateFrom = $filters['date_from'] !== ''
+            ? CarbonImmutable::createFromFormat('Y-m-d', $filters['date_from'], $timezone)->startOfDay()->utc()
+            : null;
+        $dateTo = $filters['date_to'] !== ''
+            ? CarbonImmutable::createFromFormat('Y-m-d', $filters['date_to'], $timezone)->endOfDay()->utc()
+            : null;
+
         return $query
             ->when($filters['action'] !== '', fn ($q) => $q->where('action', $filters['action']))
             ->when($filters['entity'] !== '', fn ($q) => $q->where('entity', $filters['entity']))
             ->when($filters['user_id'] !== '', fn ($q) => $q->where('user_id', (int) $filters['user_id']))
-            ->when($filters['date_from'] !== '', fn ($q) => $q->whereDate('created_at', '>=', $filters['date_from']))
-            ->when($filters['date_to'] !== '', fn ($q) => $q->whereDate('created_at', '<=', $filters['date_to']));
+            ->when($dateFrom, fn ($q) => $q->where('created_at', '>=', $dateFrom))
+            ->when($dateTo, fn ($q) => $q->where('created_at', '<=', $dateTo));
     }
 }

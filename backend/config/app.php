@@ -69,6 +69,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Audit Display Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Audit timestamps are stored in UTC and converted to this timezone when
+    | they are displayed or filtered by a calendar date.
+    |
+    */
+
+    'audit_timezone' => env('AUDIT_TIMEZONE', 'America/Argentina/Cordoba'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

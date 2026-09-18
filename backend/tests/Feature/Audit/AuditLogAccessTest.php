@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class AuditLogAccessTest extends TestCase
@@ -40,6 +41,47 @@ class AuditLogAccessTest extends TestCase
         $response = $this->actingAs($solicitante)->get('/audit-logs');
 
         $response->assertForbidden();
+    }
+
+    public function test_audit_timestamp_is_displayed_in_local_timezone(): void
+    {
+        $adminRole = Role::query()->create(['name' => 'administrador']);
+        $admin = User::factory()->create();
+        $admin->roles()->attach($adminRole->id);
+
+        Carbon::setTestNow('2026-09-18 17:27:21 UTC');
+
+        AuditLog::query()->create([
+            'entity' => 'purchase_order',
+            'entity_id' => 1,
+            'action' => 'order_created',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/audit-logs')
+            ->assertOk()
+            ->assertSee('2026-09-18 14:27:21');
+    }
+
+    public function test_audit_date_filter_uses_local_calendar_day(): void
+    {
+        $adminRole = Role::query()->create(['name' => 'administrador']);
+        $admin = User::factory()->create();
+        $admin->roles()->attach($adminRole->id);
+
+        Carbon::setTestNow('2026-09-18 02:00:00 UTC');
+
+        AuditLog::query()->create([
+            'entity' => 'purchase_order',
+            'entity_id' => 99,
+            'action' => 'local_previous_day',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/audit-logs?date_from=2026-09-17&date_to=2026-09-17')
+            ->assertOk()
+            ->assertSee('local_previous_day')
+            ->assertSee('2026-09-17 23:00:00');
     }
 
     public function test_administrador_can_export_audit_logs_pdf_with_filters(): void

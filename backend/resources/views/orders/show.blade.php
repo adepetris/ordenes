@@ -159,7 +159,7 @@
                     <tr>
                         <td>{{ \App\Support\UiLabels::auditAction($log->action) }}</td>
                         <td>{{ $log->user?->name ?: 'Sistema' }}</td>
-                        <td>{{ $log->created_at->format('Y-m-d H:i') }}</td>
+                        <td>{{ $log->local_created_at->format('Y-m-d H:i') }}</td>
                     </tr>
                 @empty
                     <tr>

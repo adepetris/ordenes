@@ -57,7 +57,7 @@
         <tbody>
             @forelse($logs as $log)
                 <tr>
-                    <td>{{ $log->created_at?->format('Y-m-d H:i:s') }}</td>
+                    <td>{{ $log->local_created_at?->format('Y-m-d H:i:s') }}</td>
                     <td>{{ $log->user?->name ?: 'Sistema' }}</td>
                     <td>{{ \App\Support\UiLabels::auditAction($log->action) }}</td>
                     <td>{{ \App\Support\UiLabels::auditEntity($log->entity) }}</td>
