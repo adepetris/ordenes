@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Orders;
 
+use App\Models\Approval;
 use App\Models\PurchaseOrder;
 use App\Models\Role;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class PurchaseOrderApprovalFlowTest extends TestCase
@@ -170,6 +172,44 @@ class PurchaseOrderApprovalFlowTest extends TestCase
             'entity_id' => $order->id,
             'action' => 'order_approved',
         ]);
+    }
+
+    public function test_approval_timestamp_is_displayed_in_local_timezone(): void
+    {
+        $solicitante = Role::query()->create(['name' => 'usuario_solicitante']);
+        $user = User::factory()->create();
+        $user->roles()->attach($solicitante->id);
+
+        $supplier = Supplier::query()->create([
+            'tax_id' => '92009',
+            'name' => 'Proveedor Fecha Local',
+            'status' => 'active',
+        ]);
+
+        $order = PurchaseOrder::query()->create([
+            'supplier_id' => $supplier->id,
+            'requester_id' => $user->id,
+            'status' => 'approved',
+            'currency' => 'USD',
+            'subtotal' => 900,
+            'tax_total' => 0,
+            'grand_total' => 900,
+        ]);
+
+        Carbon::setTestNow('2026-09-18 02:00:00 UTC');
+
+        Approval::query()->create([
+            'purchase_order_id' => $order->id,
+            'approver_id' => $user->id,
+            'level' => 1,
+            'decision' => 'approved',
+            'decided_at' => now(),
+        ]);
+
+        $this->actingAs($user)
+            ->get('/orders/'.$order->id)
+            ->assertOk()
+            ->assertSee('2026-09-17 23:00');
     }
 
     public function test_usuario_autorizado_can_reject_pending_order_with_comment(): void

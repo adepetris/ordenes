@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,6 +22,13 @@ class Approval extends Model
         return [
             'decided_at' => 'datetime',
         ];
+    }
+
+    protected function localDecidedAt(): Attribute
+    {
+        return Attribute::get(
+            fn () => $this->decided_at?->copy()->setTimezone(config('app.audit_timezone')),
+        );
     }
 
     public function purchaseOrder(): BelongsTo

@@ -186,7 +186,7 @@
                         <td>{{ $approval->decision === 'approved' ? 'Aprobada' : ($approval->decision === 'rejected' ? 'Rechazada' : ($approval->decision === 'auto_approved' ? 'Autoaprobada' : $approval->decision)) }}</td>
                         <td>{{ $approval->approver?->name ?: 'Sistema' }}</td>
                         <td>{{ $approval->comment ?: '-' }}</td>
-                        <td>{{ $approval->decided_at->format('Y-m-d H:i') }}</td>
+                        <td>{{ $approval->local_decided_at->format('Y-m-d H:i') }}</td>
                     </tr>
                 @empty
                     <tr>
