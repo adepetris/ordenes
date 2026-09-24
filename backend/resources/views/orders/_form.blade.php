@@ -2,6 +2,7 @@
 
 @php
     $orderSupplierId = isset($order) ? $order->supplier_id : '';
+    $orderBillingCompanyId = isset($order) ? $order->billing_company_id : '';
     $orderNotes = isset($order) ? $order->notes : '';
 @endphp
 
@@ -17,6 +18,20 @@
             @endforeach
         </select>
         @error('supplier_id')
+            <small class="error">{{ $message }}</small>
+        @enderror
+    </div>
+    <div>
+        <label for="billing_company_id">Facturar a:</label>
+        <select id="billing_company_id" name="billing_company_id" required>
+            <option value="">Selecciona una empresa</option>
+            @foreach($billingCompanies as $companyOption)
+                <option value="{{ $companyOption->id }}" @selected((string) old('billing_company_id', $orderBillingCompanyId) === (string) $companyOption->id)>
+                    {{ $companyOption->company_number }} - {{ $companyOption->name }} (CUIT {{ $companyOption->cuit }})
+                </option>
+            @endforeach
+        </select>
+        @error('billing_company_id')
             <small class="error">{{ $message }}</small>
         @enderror
     </div>

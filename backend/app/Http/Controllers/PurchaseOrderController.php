@@ -7,6 +7,7 @@ use App\Http\Requests\StorePurchaseOrderRequest;
 use App\Http\Requests\UpdatePurchaseOrderRequest;
 use App\Models\Approval;
 use App\Models\AuditLog;
+use App\Models\BillingCompany;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderAttachment;
 use App\Models\Supplier;
@@ -84,7 +85,7 @@ class PurchaseOrderController extends Controller
             abort(422, 'Solo se permite exportar una orden aprobada.');
         }
 
-        $order->load(['supplier', 'requester', 'items', 'approvals.approver']);
+        $order->load(['supplier', 'billingCompany', 'requester', 'items', 'approvals.approver']);
         $fileName = 'purchase_order_'.($order->order_number ?: $order->id).'.pdf';
 
         $pdf = Pdf::loadView('exports.order_single', [
@@ -103,6 +104,7 @@ class PurchaseOrderController extends Controller
     {
         return view('orders.create', [
             'suppliers' => Supplier::query()->where('status', 'active')->orderBy('name')->get(),
+            'billingCompanies' => BillingCompany::query()->orderBy('company_number')->get(),
         ]);
     }
 
@@ -121,6 +123,7 @@ class PurchaseOrderController extends Controller
                     $order = PurchaseOrder::query()->create([
                         'order_number' => $orderNumber,
                         'supplier_id' => $validated['supplier_id'],
+                        'billing_company_id' => $validated['billing_company_id'],
                         'requester_id' => $request->user()->id,
                         'status' => 'draft',
                         'currency' => strtoupper($validated['currency']),
@@ -141,6 +144,7 @@ class PurchaseOrderController extends Controller
                             'order_number' => $order->order_number,
                             'status' => $order->status,
                             'supplier_id' => $order->supplier_id,
+                            'billing_company_id' => $order->billing_company_id,
                             'currency' => $order->currency,
                             'subtotal' => $order->subtotal,
                             'tax_total' => $order->tax_total,
@@ -171,7 +175,7 @@ class PurchaseOrderController extends Controller
 
     public function show(PurchaseOrder $order): View
     {
-        $order->load(['supplier', 'requester', 'items', 'approvals.approver', 'attachments.uploader']);
+        $order->load(['supplier', 'billingCompany', 'requester', 'items', 'approvals.approver', 'attachments.uploader']);
         $auditLogs = AuditLog::query()
             ->where('entity', 'purchase_order')
             ->where('entity_id', $order->id)
@@ -195,6 +199,7 @@ class PurchaseOrderController extends Controller
         return view('orders.edit', [
             'order' => $order->load('items'),
             'suppliers' => Supplier::query()->where('status', 'active')->orderBy('name')->get(),
+            'billingCompanies' => BillingCompany::query()->orderBy('company_number')->get(),
         ]);
     }
 
@@ -206,11 +211,12 @@ class PurchaseOrderController extends Controller
 
         $validated = $request->validated();
         $totals = $this->totalsService->calculate($validated['items']);
-        $before = $order->only(['status', 'supplier_id', 'currency', 'subtotal', 'tax_total', 'grand_total']);
+        $before = $order->only(['status', 'supplier_id', 'billing_company_id', 'currency', 'subtotal', 'tax_total', 'grand_total']);
 
         DB::transaction(function () use ($order, $validated, $totals, $before): void {
             $order->update([
                 'supplier_id' => $validated['supplier_id'],
+                'billing_company_id' => $validated['billing_company_id'],
                 'currency' => strtoupper($validated['currency']),
                 'notes' => $validated['notes'] ?? null,
                 'subtotal' => $totals['subtotal'],
@@ -228,7 +234,7 @@ class PurchaseOrderController extends Controller
                 action: 'order_updated',
                 diff: [
                     'before' => $before,
-                    'after' => $order->only(['status', 'supplier_id', 'currency', 'subtotal', 'tax_total', 'grand_total']),
+                    'after' => $order->only(['status', 'supplier_id', 'billing_company_id', 'currency', 'subtotal', 'tax_total', 'grand_total']),
                     'items_count' => count($totals['items']),
                 ],
             );

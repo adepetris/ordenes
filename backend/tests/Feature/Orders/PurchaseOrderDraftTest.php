@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Orders;
 
+use App\Models\BillingCompany;
 use App\Models\PurchaseOrder;
 use App\Models\Role;
 use App\Models\Supplier;
@@ -25,8 +26,11 @@ class PurchaseOrderDraftTest extends TestCase
             'status' => 'active',
         ]);
 
+        $company = BillingCompany::query()->create(['company_number' => '1', 'name' => 'Empresa Uno', 'cuit' => '30712345678']);
+
         $response = $this->actingAs($user)->post('/orders', [
             'supplier_id' => $supplier->id,
+            'billing_company_id' => $company->id,
             'currency' => 'usd',
             'notes' => 'Orden de prueba',
             'items' => [
@@ -86,6 +90,7 @@ class PurchaseOrderDraftTest extends TestCase
 
         $payload = [
             'supplier_id' => $supplier->id,
+            'billing_company_id' => BillingCompany::query()->create(['company_number' => '2', 'name' => 'Empresa Dos', 'cuit' => '30712345679'])->id,
             'currency' => 'USD',
             'items' => [[
                 'description' => 'Item',
@@ -160,8 +165,11 @@ class PurchaseOrderDraftTest extends TestCase
             'grand_total' => 100,
         ]);
 
+        $company = BillingCompany::query()->create(['company_number' => '3', 'name' => 'Empresa Tres', 'cuit' => '30712345670']);
+
         $response = $this->actingAs($user)->put('/orders/'.$order->id, [
             'supplier_id' => $supplier->id,
+            'billing_company_id' => $company->id,
             'currency' => 'USD',
             'items' => [
                 [

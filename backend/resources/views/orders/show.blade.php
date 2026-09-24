@@ -52,6 +52,14 @@
         </article>
 
         <article class="card">
+            <h2>Facturar a:</h2>
+            <p>{{ $order->billingCompany?->name ?: 'Sin asignar' }}</p>
+            @if($order->billingCompany)
+                <p class="muted">Nº Empresa: {{ $order->billingCompany->company_number }} · CUIT: {{ $order->billingCompany->cuit }}</p>
+            @endif
+        </article>
+
+        <article class="card">
             <h2>Solicitante</h2>
             <p>{{ $order->requester->name }}</p>
             <p class="muted">{{ $order->requester->email }}</p>

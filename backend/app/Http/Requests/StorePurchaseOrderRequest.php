@@ -20,6 +20,7 @@ class StorePurchaseOrderRequest extends FormRequest
                 'required',
                 Rule::exists('suppliers', 'id')->where(fn ($query) => $query->where('status', 'active')),
             ],
+            'billing_company_id' => ['required', Rule::exists('billing_companies', 'id')],
             'currency' => ['required', 'string', 'size:3'],
             'notes' => ['nullable', 'string', 'max:3000'],
             'items' => ['required', 'array', 'min:1'],

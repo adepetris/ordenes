@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\PasswordChangeController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BillingCompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SupplierController;
@@ -51,6 +52,17 @@ Route::middleware(['auth', 'force.password.change'])->group(function (): void {
     Route::get('/suppliers/export', [SupplierController::class, 'export'])
         ->middleware('role:administrador,usuario_solicitante,usuario_autorizado')
         ->name('suppliers.export');
+
+    Route::get('/billing-companies', [BillingCompanyController::class, 'index'])
+        ->middleware('role:administrador,usuario_solicitante,usuario_autorizado')
+        ->name('billing-companies.index');
+
+    Route::middleware('role:administrador,usuario_autorizado')->group(function (): void {
+        Route::get('/billing-companies/create', [BillingCompanyController::class, 'create'])->name('billing-companies.create');
+        Route::post('/billing-companies', [BillingCompanyController::class, 'store'])->name('billing-companies.store');
+        Route::get('/billing-companies/{billingCompany}/edit', [BillingCompanyController::class, 'edit'])->name('billing-companies.edit');
+        Route::put('/billing-companies/{billingCompany}', [BillingCompanyController::class, 'update'])->name('billing-companies.update');
+    });
 
     Route::middleware('role:administrador,usuario_solicitante,usuario_autorizado')->group(function (): void {
         Route::get('/orders/create', [PurchaseOrderController::class, 'create'])->name('orders.create');

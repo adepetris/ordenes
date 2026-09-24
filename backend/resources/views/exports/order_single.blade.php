@@ -41,6 +41,7 @@
     <div class="meta">
         <p>Estado: {{ \App\Support\UiLabels::orderStatus($order->status) }}</p>
         <p>Proveedor: {{ $order->supplier?->name ?: '-' }} ({{ $order->supplier?->tax_id ?: '-' }})</p>
+        <p>Facturar a: {{ $order->billingCompany?->name ?: 'Sin asignar' }}@if($order->billingCompany) (Nº Empresa {{ $order->billingCompany->company_number }}, CUIT {{ $order->billingCompany->cuit }})@endif</p>
         <p>Solicitante: {{ $order->requester?->name ?: '-' }}</p>
         <p>Fecha de creacion: {{ $order->created_at?->format('Y-m-d H:i:s') }}</p>
     </div>

@@ -43,6 +43,7 @@
                             <a href="{{ route('users.index') }}" class="nav-link">Usuarios</a>
                         @endif
                         <a href="{{ route('suppliers.index') }}" class="nav-link">Proveedores</a>
+                        <a href="{{ route('billing-companies.index') }}" class="nav-link">Empresas</a>
                     </nav>
 
                     <div class="topbar-actions">

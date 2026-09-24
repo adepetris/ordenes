@@ -11,6 +11,7 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'order_number',
         'supplier_id',
+        'billing_company_id',
         'requester_id',
         'status',
         'currency',
@@ -38,6 +39,11 @@ class PurchaseOrder extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function billingCompany(): BelongsTo
+    {
+        return $this->belongsTo(BillingCompany::class);
     }
 
     public function requester(): BelongsTo
